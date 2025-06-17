@@ -1,6 +1,6 @@
 package com.appku.bookingbus.api.response;
 
-import com.appku.bookingbus.data.model.Bus;
+import com.appku.bookingbus.data.model.ListBus;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class BusListResponse {
     public static class Data {
         @SerializedName("current_page")
         private int currentPage;
-        private List<Bus> data;
+        private List<ListBus> data;
         @SerializedName("first_page_url")
         private String firstPageUrl;
         private int from;
@@ -34,7 +34,7 @@ public class BusListResponse {
         private int to;
         private int total;
 
-        public List<Bus> getData() { return data; }
+        public List<ListBus> getData() { return data; }
         // Other getters as needed
     }
 }

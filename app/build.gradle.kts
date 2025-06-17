@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "com.appku.bookingbus"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.appku.bookingbus"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -41,12 +41,12 @@ dependencies {
     implementation("androidx.core:core:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.activity:activity:1.8.0")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
-    implementation("androidx.navigation:navigation-fragment:2.7.1")
-    implementation("androidx.navigation:navigation-ui:2.7.1")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.7.0")
+    implementation("androidx.navigation:navigation-fragment:2.7.7")
+    implementation("androidx.navigation:navigation-ui:2.7.7")
 
     // Kotlin (single version)
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.22"))
@@ -56,14 +56,24 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // Glide for image loading
-    implementation("com.github.bumptech.glide:glide:4.15.1")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // Lottie
     implementation("com.airbnb.android:lottie:6.1.0")
 
     // Biometric
     implementation("androidx.biometric:biometric:1.1.0")
+
+    // Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-maps:18.0.2")
+
+    // Image Slider
+//    implementation("com.github.denzcoskun:ImageSlideshow:0.1.2")
+    
+    // Gson
+    implementation("com.google.code.gson:gson:2.10.1")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

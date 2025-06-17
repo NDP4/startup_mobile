@@ -1,13 +1,15 @@
 // ApiService.java
 package com.appku.bookingbus.api;
 
+import com.appku.bookingbus.api.request.BookingRequest;
 import com.appku.bookingbus.api.request.LoginRequest;
 import com.appku.bookingbus.api.request.RegisterRequest;
 import com.appku.bookingbus.api.response.AuthResponse;
 import com.appku.bookingbus.api.response.ApiResponse;
+import com.appku.bookingbus.api.response.BookingResponse;
 import com.appku.bookingbus.api.response.UserDetailResponse;
 import com.appku.bookingbus.api.response.BusListResponse;
-import com.appku.bookingbus.data.model.Bus;
+import com.appku.bookingbus.api.response.BusResponse;
 
 import java.util.List;
 import retrofit2.Call;
@@ -15,6 +17,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface ApiService {
     @POST("user/register")
@@ -28,4 +31,14 @@ public interface ApiService {
     
     @GET("buses")
     Call<BusListResponse> getBuses(@Header("Authorization") String token);
+
+    @GET("buses/{id}")
+    Call<BusResponse> getBusById(@Header("Authorization") String token, @Path("id") int id);
+
+    @POST("buses/{bus}/book")
+    Call<BookingResponse> createBooking(
+            @Header("Authorization") String token,
+            @Path("bus") int busId,
+            @Body BookingRequest request
+    );
 }

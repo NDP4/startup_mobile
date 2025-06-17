@@ -11,7 +11,7 @@
         android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome"
+        android:text="Welcome,"
         android:textSize="14sp"
         android:textColor="#757575"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,17 +30,31 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvWelcome"/>
 
+
+    <TextView
+        android:id="@+id/tvLocation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        tools:text="Jakarta, Indonesia"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUsername"/>
+
     <TextView
         android:id="@+id/tvAvailableBuses"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="Available Buses"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="#212121"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvUsername"/>
+        app:layout_constraintTop_toBottomOf="@id/tvLocation"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBusList"
