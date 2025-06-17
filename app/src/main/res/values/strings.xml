@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">BookingBus</string>
+    <string name="title_activity_bt">BtActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_profile">Profile</string>
+    <string name="onboarding_title">Travel with Comfort</string>
+    <string name="onboarding_description">Book your bus easily and securely. Enjoy comfortable travel with our premium bus service.</string>
+    <string name="get_started">Get Started</string>
+
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
+</resources>

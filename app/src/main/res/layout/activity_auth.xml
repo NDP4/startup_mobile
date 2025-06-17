@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="false"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/imageIllustration"
+        android:layout_width="match_parent"
+        android:layout_height="340dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_top"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvWelcome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="32dp"
+        android:text="Welcome Back!"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageIllustration" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="8dp"
+        android:text="Choose your preferred way to continue"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvWelcome" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvSubtitle" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="16dp"
+        android:paddingVertical="16dp"
+        android:text="Login"
+        android:textAllCaps="false"
+        app:cornerRadius="12dp"
+        android:backgroundTint="@color/primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnGoogle" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRegister"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="8dp"
+        android:paddingVertical="16dp"
+        android:text="Register"
+        android:textAllCaps="false"
+        app:cornerRadius="12dp"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        app:strokeColor="@color/primary"
+        android:textColor="@color/primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
