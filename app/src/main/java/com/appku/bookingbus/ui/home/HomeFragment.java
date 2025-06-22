@@ -54,6 +54,7 @@ import com.appku.bookingbus.api.response.BusListResponse;
 import com.appku.bookingbus.databinding.FragmentHomeBinding;
 import com.appku.bookingbus.data.model.ListBus;
 import com.appku.bookingbus.utils.SessionManager;
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -76,6 +77,7 @@ public class HomeFragment extends Fragment {
     private List<ListBus> allBuses = new ArrayList<>();
 
     private androidx.appcompat.widget.SearchView searchView;
+    private ShimmerFrameLayout shimmerLayout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -85,6 +87,9 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Tambahkan shimmerLayout
+        shimmerLayout = binding.shimmerBusList;
 
         searchView = binding.searchView;
 
@@ -367,11 +372,19 @@ public class HomeFragment extends Fragment {
         SessionManager sessionManager = new SessionManager(requireContext());
         String token = "Bearer " + sessionManager.getToken();
 
+        shimmerLayout.setVisibility(View.VISIBLE);
+        shimmerLayout.startShimmer();
+        binding.rvBusList.setVisibility(View.GONE);
+
         ApiClient.getInstance().getService().getBuses(token).enqueue(new Callback<BusListResponse>() {
             @Override
             public void onResponse(@NonNull Call<BusListResponse> call, @NonNull Response<BusListResponse> response) {
                 hideLoading();
                 binding.swipeRefresh.setRefreshing(false);
+
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+                binding.rvBusList.setVisibility(View.VISIBLE);
 
                 if (response.isSuccessful() && response.body() != null) {
                     BusListResponse busResponse = response.body();
@@ -387,6 +400,11 @@ public class HomeFragment extends Fragment {
             public void onFailure(@NonNull Call<BusListResponse> call, @NonNull Throwable t) {
                 hideLoading();
                 binding.swipeRefresh.setRefreshing(false);
+
+                shimmerLayout.stopShimmer();
+                shimmerLayout.setVisibility(View.GONE);
+                binding.rvBusList.setVisibility(View.VISIBLE);
+
                 showError("Network error: " + t.getMessage());
             }
         });
@@ -395,12 +413,18 @@ public class HomeFragment extends Fragment {
     private void showLoading() {
         if (binding != null) {
             binding.progressBar.setVisibility(View.VISIBLE);
+            shimmerLayout.setVisibility(View.VISIBLE);
+            shimmerLayout.startShimmer();
+            binding.rvBusList.setVisibility(View.GONE);
         }
     }
 
     private void hideLoading() {
         if (binding != null) {
             binding.progressBar.setVisibility(View.GONE);
+            shimmerLayout.stopShimmer();
+            shimmerLayout.setVisibility(View.GONE);
+            binding.rvBusList.setVisibility(View.VISIBLE);
         }
     }
 

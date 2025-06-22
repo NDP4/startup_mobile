@@ -50,7 +50,7 @@
                 android:id="@+id/emptyView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tidak ada booking"
+                android:text="Anda belum memiliki riwayat sewa"
                 android:textSize="16sp"
                 android:textColor="@color/black"
                 android:layout_gravity="center"

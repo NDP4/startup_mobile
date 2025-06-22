@@ -54,6 +54,9 @@ public class BookingHistoryActivity extends AppCompatActivity {
                         List<Booking> bookings = response.body().getData();
                         adapter.setBookings(bookings);
                         binding.emptyView.setVisibility(bookings.isEmpty() ? View.VISIBLE : View.GONE);
+                        if (bookings.isEmpty()) {
+                            binding.emptyView.setText("Anda belum memiliki riwayat sewa");
+                        }
                     } else {
                         Toast.makeText(BookingHistoryActivity.this, "Failed to load bookings", Toast.LENGTH_SHORT).show();
                     }
