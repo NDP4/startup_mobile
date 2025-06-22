@@ -71,7 +71,10 @@ dependencies {
 
     // Image Slider
 //    implementation("com.github.denzcoskun:ImageSlideshow:0.1.2")
-    
+
+
+    // swipe refresh
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
     

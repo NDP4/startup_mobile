@@ -36,7 +36,8 @@
         <activity
             android:name=".BtActivity"
             android:exported="false"
-            android:label="@string/title_activity_bt" />
+            android:label="@string/title_activity_bt"
+            android:theme="@style/Theme.BookingBus.NoActionBar" />
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -55,6 +56,10 @@
             android:theme="@style/Theme.BookingBus.NoActionBar" />
         <activity
             android:name=".ui.booking.BookingActivity"
+            android:theme="@style/Theme.BookingBus.NoActionBar" />
+        <activity
+            android:name=".ui.booking.BookingDetailActivity"
+            android:exported="false"
             android:theme="@style/Theme.BookingBus.NoActionBar" />
     </application>
 

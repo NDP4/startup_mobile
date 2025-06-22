@@ -1,5 +1,6 @@
 package com.appku.bookingbus.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,14 +26,22 @@ public class TabImageAdapter {
         for (int i = 0; i < imageUrls.size(); i++) {
             View customView = LayoutInflater.from(context).inflate(R.layout.item_tab_image, null);
             ImageView imageView = customView.findViewById(R.id.ivTabImage);
-            
-            Glide.with(context)
-                .load(imageUrls.get(i))
-                .centerCrop()
-                .placeholder(R.drawable.bus_placeholder)
-                .error(R.drawable.bus_placeholder)
-                .override(60, 60)
-                .into(imageView);
+
+            // Fix: Only load image if context is valid
+            boolean canLoad = true;
+            if (context instanceof Activity) {
+                Activity act = (Activity) context;
+                canLoad = !act.isFinishing() && !act.isDestroyed();
+            }
+            if (canLoad) {
+                Glide.with(context.getApplicationContext())
+                    .load(imageUrls.get(i))
+                    .centerCrop()
+                    .placeholder(R.drawable.bus_placeholder)
+                    .error(R.drawable.bus_placeholder)
+                    .override(60, 60)
+                    .into(imageView);
+            }
 
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             if (tab != null) {

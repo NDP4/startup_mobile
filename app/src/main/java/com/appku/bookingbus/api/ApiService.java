@@ -10,6 +10,8 @@ import com.appku.bookingbus.api.response.BookingResponse;
 import com.appku.bookingbus.api.response.UserDetailResponse;
 import com.appku.bookingbus.api.response.BusListResponse;
 import com.appku.bookingbus.api.response.BusResponse;
+import com.appku.bookingbus.api.response.BookingListResponse;
+import com.appku.bookingbus.api.response.BookingDetailResponse;
 
 import java.util.List;
 import retrofit2.Call;
@@ -41,4 +43,10 @@ public interface ApiService {
             @Path("bus") int busId,
             @Body BookingRequest request
     );
+
+    @GET("bookings")
+    Call<BookingListResponse> getBookings(@Header("Authorization") String token);
+
+    @GET("bookings/{id}")
+    Call<BookingDetailResponse> getBookingDetail(@Header("Authorization") String token, @Path("id") int bookingId);
 }

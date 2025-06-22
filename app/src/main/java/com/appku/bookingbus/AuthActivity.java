@@ -123,7 +123,7 @@ public class AuthActivity extends AppCompatActivity {
 
         View imageIllustration = findViewById(R.id.imageIllustration);
         TextView tvSubtitle = findViewById(R.id.tvSubtitle);
-        MaterialButton btnGoogle = findViewById(R.id.btnGoogle);
+        // MaterialButton btnGoogle = findViewById(R.id.btnGoogle); // dihapus
         MaterialButton btnLogin = findViewById(R.id.btnLogin);
         MaterialButton btnRegister = findViewById(R.id.btnRegister);
 
@@ -133,7 +133,7 @@ public class AuthActivity extends AppCompatActivity {
         imageIllustration.setTranslationY(-300f);
         imageIllustration.setAlpha(0f);
         tvSubtitle.setText("");
-        btnGoogle.setAlpha(0f);
+        // btnGoogle.setAlpha(0f); // dihapus
         btnLogin.setAlpha(0f);
         btnRegister.setAlpha(0f);
 
@@ -146,12 +146,12 @@ public class AuthActivity extends AppCompatActivity {
         imageAnimSet.setDuration(1000);
 
         // Button animations
-        ObjectAnimator googleAlpha = ObjectAnimator.ofFloat(btnGoogle, "alpha", 0f, 1f);
+        // ObjectAnimator googleAlpha = ObjectAnimator.ofFloat(btnGoogle, "alpha", 0f, 1f); // dihapus
         ObjectAnimator loginAlpha = ObjectAnimator.ofFloat(btnLogin, "alpha", 0f, 1f);
         ObjectAnimator registerAlpha = ObjectAnimator.ofFloat(btnRegister, "alpha", 0f, 1f);
 
         AnimatorSet buttonAnimSet = new AnimatorSet();
-        buttonAnimSet.playTogether(googleAlpha, loginAlpha, registerAlpha);
+        buttonAnimSet.playTogether(loginAlpha, registerAlpha);
         buttonAnimSet.setDuration(1000);
 
         // biometric button in login
@@ -175,12 +175,13 @@ public class AuthActivity extends AppCompatActivity {
 
         // Handle button clicks
         View.OnClickListener buttonClickListener = v -> {
-            performExitAnimation(imageIllustration, btnGoogle, btnLogin, btnRegister);
+            performExitAnimation(imageIllustration, /*btnGoogle,*/ btnLogin, btnRegister);
             new Handler().postDelayed(() -> {
                 // Handle different button actions here
-                if (v.getId() == R.id.btnGoogle) {
-                    handleGoogleSignIn();
-                } else if (v.getId() == R.id.btnLogin) {
+                // if (v.getId() == R.id.btnGoogle) {
+                //     handleGoogleSignIn();
+                // } else 
+                if (v.getId() == R.id.btnLogin) {
                     showLoginBottomSheet();
                 } else if (v.getId() == R.id.btnRegister) {
                     showRegisterBottomSheet();
@@ -188,7 +189,7 @@ public class AuthActivity extends AppCompatActivity {
             }, 500);
         };
 
-//        btnGoogle.setOnClickListener(v -> signInWithGoogle());
+        // btnGoogle.setOnClickListener(v -> signInWithGoogle()); // dihapus
         btnLogin.setOnClickListener(v -> showLoginBottomSheet());
         btnRegister.setOnClickListener(v -> showRegisterBottomSheet());
     }

@@ -15,7 +15,11 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.appku.bookingbus.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard" >
+        <action
+            android:id="@+id/action_dashboard_to_bookingHistory"
+            app:destination="@id/bookingHistoryFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
@@ -28,4 +32,10 @@
         android:name="com.appku.bookingbus.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/bookingHistoryFragment"
+        android:name="com.appku.bookingbus.ui.booking.BookingHistoryFragment"
+        android:label="Booking History"
+        tools:layout="@layout/fragment_booking_history" />
 </navigation>

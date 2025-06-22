@@ -10,4 +10,7 @@
     <string name="get_started">Get Started</string>
 
     <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
+    <string name="booking_history">Booking History</string>
+    <string name="search_bus_hint">Search bus...</string>
+    <string name="no_buses_available">No buses available</string>
 </resources>

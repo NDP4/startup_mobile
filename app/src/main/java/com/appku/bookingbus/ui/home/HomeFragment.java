@@ -15,9 +15,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.ViewTreeObserver;
+import android.os.Build;
 import android.widget.Toast;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import com.appku.bookingbus.adapter.BusSuggestionAdapter;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.appku.bookingbus.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -26,6 +36,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -39,10 +54,6 @@ import com.appku.bookingbus.api.response.BusListResponse;
 import com.appku.bookingbus.databinding.FragmentHomeBinding;
 import com.appku.bookingbus.data.model.ListBus;
 import com.appku.bookingbus.utils.SessionManager;
-
-import java.util.List;
-import java.util.Locale;
-
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -61,24 +72,154 @@ public class HomeFragment extends Fragment {
     private LocationCallback locationCallback;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     private static final int BACKGROUND_LOCATION_PERMISSION_REQUEST_CODE = 1002;
+    private BusSuggestionAdapter suggestionAdapter;
+    private List<ListBus> allBuses = new ArrayList<>();
+
+    private androidx.appcompat.widget.SearchView searchView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
 
+
+
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        
+
+        searchView = binding.searchView;
+
         setupBusList();
+        setupSearch();
         setupLocation();
         observeData();
-        
+
+        // Setup SwipeRefreshLayout
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            showLoading();
+            loadBuses();
+        });
+
         return root;
     }
-    
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Pastikan hanya headerContent yang diberi padding status bar
+        final View header = binding.headerContent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT_WATCH) {
+            header.setOnApplyWindowInsetsListener((v, insets) -> {
+                int topInset = insets.getSystemWindowInsetTop();
+                v.setPadding(
+                    v.getPaddingLeft(),
+                    topInset,
+                    v.getPaddingRight(),
+                    v.getPaddingBottom()
+                );
+                return insets;
+            });
+            header.requestApplyInsets();
+        } else {
+            header.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    int statusBarHeight = 0;
+                    int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+                    if (resourceId > 0) {
+                        statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+                    }
+                    header.setPadding(
+                        header.getPaddingLeft(),
+                        statusBarHeight,
+                        header.getPaddingRight(),
+                        header.getPaddingBottom()
+                    );
+                    header.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            });
+        }
+    }
+
+    private void setupSearch() {
+        suggestionAdapter = new BusSuggestionAdapter();
+        binding.rvSuggestions.setAdapter(suggestionAdapter);
+        binding.rvSuggestions.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvSuggestions.bringToFront();
+        binding.rvSuggestions.setElevation(8f);
+
+        suggestionAdapter.setOnSuggestionClickListener(bus -> {
+            Intent intent = new Intent(requireContext(), com.appku.bookingbus.ui.detail.DetailBusActivity.class);
+            intent.putExtra("bus_id", bus.getId());
+            startActivity(intent);
+            binding.rvSuggestions.setVisibility(View.GONE);
+            searchView.setQuery(bus.getName(), false);
+            searchView.clearFocus();
+            List<ListBus> single = new ArrayList<>();
+            single.add(bus);
+            busAdapter.setBuses(single);
+        });
+
+        // Ganti TextWatcher dengan SearchView.OnQueryTextListener
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterBusList(query);
+                binding.rvSuggestions.setVisibility(View.GONE);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterBusList(newText);
+                return true;
+            }
+        });
+
+        // Hide suggestions when focus lost or user scrolls
+        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) binding.rvSuggestions.setVisibility(View.GONE);
+        });
+
+        binding.rvBusList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                binding.rvSuggestions.setVisibility(View.GONE);
+            }
+        });
+
+        binding.getRoot().setOnTouchListener((v, event) -> {
+            binding.rvSuggestions.setVisibility(View.GONE);
+            searchView.clearFocus();
+            return false;
+        });
+    }
+
+    private void filterBusList(String query) {
+        if (allBuses == null) return;
+        if (query == null || query.isEmpty()) {
+            busAdapter.setBuses(allBuses);
+            binding.rvSuggestions.setVisibility(View.GONE);
+            return;
+        }
+        List<ListBus> filtered = new ArrayList<>();
+        for (ListBus bus : allBuses) {
+            if (bus.getName().toLowerCase().contains(query.toLowerCase())) {
+                filtered.add(bus);
+            }
+        }
+        busAdapter.setBuses(filtered);
+        if (!filtered.isEmpty()) {
+            suggestionAdapter.setSuggestions(filtered);
+            binding.rvSuggestions.setVisibility(View.VISIBLE);
+        } else {
+            binding.rvSuggestions.setVisibility(View.GONE);
+        }
+    }
+
     private void setupLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        
+
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -87,6 +228,10 @@ public class HomeFragment extends Fragment {
                 }
                 for (Location location : locationResult.getLocations()) {
                     updateLocationUI(location);
+                    // Stop location updates after getting location
+                    if (fusedLocationClient != null && locationCallback != null) {
+                        fusedLocationClient.removeLocationUpdates(locationCallback);
+                    }
                 }
             }
         };
@@ -196,30 +341,38 @@ public class HomeFragment extends Fragment {
         homeViewModel.getText().observe(getViewLifecycleOwner(), text -> {
             binding.tvWelcome.setText(text);
         });
-        
+
         // Observe bus list
         homeViewModel.getBuses().observe(getViewLifecycleOwner(), buses -> {
             if (buses != null && !buses.isEmpty()) {
                 android.util.Log.d("HomeFragment", "Received buses: " + buses.size());
                 busAdapter.setBuses(buses);
                 busAdapter.notifyDataSetChanged();
+                allBuses = buses; // Simpan semua bus untuk pencarian
+                // Reset search jika ada data baru
+                if (searchView.getQuery() == null || searchView.getQuery().toString().isEmpty()) {
+                    busAdapter.setBuses(allBuses);
+                } else {
+                    filterBusList(searchView.getQuery().toString());
+                }
             } else {
                 android.util.Log.e("HomeFragment", "No buses received");
+                busAdapter.setBuses(new ArrayList<>());
             }
         });
     }
 
     private void loadBuses() {
-        binding.progressBar.setVisibility(View.VISIBLE);
-        
+        showLoading();
         SessionManager sessionManager = new SessionManager(requireContext());
         String token = "Bearer " + sessionManager.getToken();
-        
+
         ApiClient.getInstance().getService().getBuses(token).enqueue(new Callback<BusListResponse>() {
             @Override
             public void onResponse(@NonNull Call<BusListResponse> call, @NonNull Response<BusListResponse> response) {
-                binding.progressBar.setVisibility(View.GONE);
-                
+                hideLoading();
+                binding.swipeRefresh.setRefreshing(false);
+
                 if (response.isSuccessful() && response.body() != null) {
                     BusListResponse busResponse = response.body();
                     if (busResponse.isSuccess() && busResponse.getData() != null) {
@@ -232,10 +385,23 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<BusListResponse> call, @NonNull Throwable t) {
-                binding.progressBar.setVisibility(View.GONE);
+                hideLoading();
+                binding.swipeRefresh.setRefreshing(false);
                 showError("Network error: " + t.getMessage());
             }
         });
+    }
+
+    private void showLoading() {
+        if (binding != null) {
+            binding.progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideLoading() {
+        if (binding != null) {
+            binding.progressBar.setVisibility(View.GONE);
+        }
     }
 
     private void showError(String message) {
@@ -286,6 +452,7 @@ public class HomeFragment extends Fragment {
         if (fusedLocationClient != null && locationCallback != null) {
             fusedLocationClient.removeLocationUpdates(locationCallback);
         }
+        hideLoading();
         binding = null;
     }
 }
