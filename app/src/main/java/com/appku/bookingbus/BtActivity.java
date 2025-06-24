@@ -3,6 +3,7 @@ package com.appku.bookingbus;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -11,6 +12,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.appku.bookingbus.databinding.ActivityBtBinding;
+import com.appku.bookingbus.ui.chat.ChatDialogFragment;
 
 public class BtActivity extends AppCompatActivity {
 
@@ -32,6 +34,13 @@ public class BtActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_bt);
 //        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        FloatingActionButton fabChat = findViewById(R.id.fabChat);
+        if (fabChat != null) {
+            fabChat.setOnClickListener(v -> {
+                new ChatDialogFragment().show(getSupportFragmentManager(), "chat_dialog");
+            });
+        }
     }
 
 }

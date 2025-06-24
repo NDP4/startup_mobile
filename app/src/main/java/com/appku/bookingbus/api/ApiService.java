@@ -3,11 +3,15 @@ package com.appku.bookingbus.api;
 
 import com.appku.bookingbus.api.request.BookingRequest;
 import com.appku.bookingbus.api.request.LoginRequest;
+import com.appku.bookingbus.api.request.MessageBody;
 import com.appku.bookingbus.api.request.RegisterRequest;
 import com.appku.bookingbus.api.request.PaymentRequest;
 import com.appku.bookingbus.api.response.AuthResponse;
 import com.appku.bookingbus.api.response.ApiResponse;
 import com.appku.bookingbus.api.response.BookingResponse;
+import com.appku.bookingbus.api.response.ChatResponse;
+import com.appku.bookingbus.api.response.SendMessageResponse;
+import com.appku.bookingbus.api.response.UnreadCountResponse;
 import com.appku.bookingbus.api.response.UserDetailResponse;
 import com.appku.bookingbus.api.response.BusListResponse;
 import com.appku.bookingbus.api.response.BusResponse;
@@ -15,11 +19,14 @@ import com.appku.bookingbus.api.response.BookingListResponse;
 import com.appku.bookingbus.api.response.BookingDetailResponse;
 import com.appku.bookingbus.api.response.PaymentResponse;
 import com.appku.bookingbus.api.response.ReviewListResponse;
+import com.appku.bookingbus.api.response.CrewAssignmentResponse;
 import com.appku.bookingbus.data.model.UserResponse;
 
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -67,4 +74,19 @@ public interface ApiService {
 
     @GET("reviews")
     Call<ReviewListResponse> getReviews(@Header("Authorization") String token);
+
+    @GET("crew-assignments")
+    Call<CrewAssignmentResponse> getCrewAssignments(@Header("Authorization") String token);
+
+    @GET("chat")
+    Call<ChatResponse> getChatMessages(@Header("Authorization") String token);
+
+    @POST("chat")
+    Call<SendMessageResponse> sendChatMessage(
+        @Header("Authorization") String token,
+        @Body MessageBody messageBody
+    );
+
+    @GET("chat/unread-count")
+    Call<UnreadCountResponse> getUnreadCount(@Header("Authorization") String token);
 }

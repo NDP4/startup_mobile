@@ -96,8 +96,8 @@ public class BookingDetailActivity extends AppCompatActivity {
         // Optionally set chip color based on status
 
         // Set tanggal sewa & kembali
-        binding.tvBookingDate.setText(booking.getBookingDate());
-        binding.tvReturnDate.setText(booking.getReturnDate());
+        binding.tvBookingDate.setText(formatDate(booking.getBookingDate()));
+        binding.tvReturnDate.setText(formatDate(booking.getReturnDate()));
 
         // Booking Info
         binding.tvPickupLocation.setText(booking.getPickupLocation());
@@ -198,5 +198,14 @@ public class BookingDetailActivity extends AppCompatActivity {
                         Toast.makeText(BookingDetailActivity.this, "Network error", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private String formatDate(String dateTime) {
+        if (dateTime == null) return "-";
+        try {
+            return dateTime.split("T")[0];
+        } catch (Exception e) {
+            return dateTime;
+        }
     }
 }

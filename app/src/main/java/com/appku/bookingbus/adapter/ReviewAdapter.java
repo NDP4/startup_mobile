@@ -33,7 +33,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         Review review = reviews.get(position);
         holder.tvBusName.setText(review.getBus() != null ? review.getBus().getName() : "-");
         holder.tvCustomerName.setText(review.getBooking() != null ? review.getBooking().getCustomerName() : "-");
-        holder.tvBookingDate.setText(review.getBooking() != null ? review.getBooking().getBookingDate() : "-");
+        holder.tvBookingDate.setText(review.getBooking() != null ? formatDate(review.getBooking().getBookingDate()) : "-");
         holder.tvComment.setText(review.getBus() != null ? review.getBus().getComment() : "-");
         holder.tvRating.setText(String.valueOf(review.getBus() != null ? review.getBus().getRating() : 0));
     }
@@ -53,6 +53,15 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
             tvBookingDate = itemView.findViewById(R.id.tvBookingDate);
             tvComment = itemView.findViewById(R.id.tvComment);
             tvRating = itemView.findViewById(R.id.tvRating);
+        }
+    }
+
+    private String formatDate(String dateTime) {
+        if (dateTime == null) return "-";
+        try {
+            return dateTime.split("T")[0];
+        } catch (Exception e) {
+            return dateTime;
         }
     }
 }
