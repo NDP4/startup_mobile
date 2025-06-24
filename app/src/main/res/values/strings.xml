@@ -13,4 +13,13 @@
     <string name="booking_history">Booking History</string>
     <string name="search_bus_hint">Search bus...</string>
     <string name="no_buses_available">No buses available</string>
+    <string name="profile_image">Profile Image</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="phone">Phone</string>
+    <string name="phone_icon">Phone Icon</string>
+    <string name="address">Address</string>
+    <string name="address_icon">Address Icon</string>
+    <string name="logout">Logout</string>
+    <string name="username">username</string>
+    <string name="email">email</string>
 </resources>
