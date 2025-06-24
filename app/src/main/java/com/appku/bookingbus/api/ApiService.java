@@ -14,6 +14,7 @@ import com.appku.bookingbus.api.response.BusResponse;
 import com.appku.bookingbus.api.response.BookingListResponse;
 import com.appku.bookingbus.api.response.BookingDetailResponse;
 import com.appku.bookingbus.api.response.PaymentResponse;
+import com.appku.bookingbus.api.response.ReviewListResponse;
 import com.appku.bookingbus.data.model.UserResponse;
 
 import java.util.List;
@@ -63,4 +64,7 @@ public interface ApiService {
         @Header("Authorization") String token,
         @Body PaymentRequest paymentRequest
     );
+
+    @GET("reviews")
+    Call<ReviewListResponse> getReviews(@Header("Authorization") String token);
 }

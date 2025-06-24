@@ -11,11 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.appku.bookingbus.R;
 import com.appku.bookingbus.adapter.ImageSliderAdapter;
 import com.appku.bookingbus.adapter.TabImageAdapter;
+import com.appku.bookingbus.adapter.ReviewAdapter;
 import com.appku.bookingbus.api.ApiClient;
 import com.appku.bookingbus.api.response.BusListResponse;
 import com.appku.bookingbus.api.response.BusResponse;
+import com.appku.bookingbus.api.response.ReviewListResponse;
 import com.appku.bookingbus.data.model.DetailBus;
 import com.appku.bookingbus.data.model.ListBus;
+import com.appku.bookingbus.data.model.Review;
 import com.appku.bookingbus.databinding.ActivityDetailBusBinding;
 import com.appku.bookingbus.utils.SessionManager;
 import com.bumptech.glide.Glide;
@@ -25,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,6 +40,7 @@ public class DetailBusActivity extends AppCompatActivity {
     private DetailBus bus;
 
     private List<String> imageUrls = new ArrayList<>();
+    private ReviewAdapter reviewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,7 @@ public class DetailBusActivity extends AppCompatActivity {
         int busId = getIntent().getIntExtra("bus_id", -1);
         if (busId != -1) {
             loadBusDetails(busId);
+            loadReviews(busId);
         } else {
             Toast.makeText(this, "Error: Bus ID not found", Toast.LENGTH_SHORT).show();
             finish();
@@ -68,6 +74,11 @@ public class DetailBusActivity extends AppCompatActivity {
             intent.putExtra("max_seats", bus.getDefault_seat_capacity());
             startActivity(intent);
         });
+        
+        // Inisialisasi reviewAdapter dan RecyclerView
+        reviewAdapter = new ReviewAdapter();
+        binding.rvReviews.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvReviews.setAdapter(reviewAdapter);
     }
     
     private void setupBusDetails(DetailBus bus) {
@@ -219,6 +230,43 @@ public class DetailBusActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+    
+    private void loadReviews(int busId) {
+        String token = "Bearer " + new SessionManager(this).getToken();
+        ApiClient.getInstance().getService().getReviews(token)
+            .enqueue(new Callback<ReviewListResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<ReviewListResponse> call, @NonNull Response<ReviewListResponse> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        List<Review> allReviews = response.body().getData();
+                        // Filter hanya review untuk bus ini
+                        List<Review> busReviews = new ArrayList<>();
+                        for (Review r : allReviews) {
+                            if (r.getBus() != null && r.getBus().getId() == busId) {
+                                busReviews.add(r);
+                            }
+                        }
+                        showReviews(busReviews);
+                    }
+                }
+                @Override
+                public void onFailure(@NonNull Call<ReviewListResponse> call, @NonNull Throwable t) {
+                    // Tampilkan error atau kosong
+                    showReviews(new ArrayList<>());
+                }
+            });
+    }
+
+    private void showReviews(List<Review> reviews) {
+        reviewAdapter.setReviews(reviews);
+        if (reviews == null || reviews.isEmpty()) {
+            binding.rvReviews.setVisibility(View.GONE);
+            binding.tvNoReview.setVisibility(View.VISIBLE);
+        } else {
+            binding.rvReviews.setVisibility(View.VISIBLE);
+            binding.tvNoReview.setVisibility(View.GONE);
+        }
     }
     
     @Override
