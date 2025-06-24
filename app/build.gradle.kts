@@ -85,4 +85,7 @@ dependencies {
 
     // Shimmer
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    // Circle Image View
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }

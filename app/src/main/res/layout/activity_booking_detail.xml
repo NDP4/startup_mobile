@@ -324,6 +324,14 @@
                         android:text="Payment Status: Pending"
                         android:textColor="@color/grey_700"/>
                 </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnPay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bayar Sekarang"
+                    android:visibility="gone"
+                    android:layout_marginTop="16dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

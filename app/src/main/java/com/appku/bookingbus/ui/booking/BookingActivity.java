@@ -1,6 +1,7 @@
 package com.appku.bookingbus.ui.booking;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,8 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.appku.bookingbus.R;
 import com.appku.bookingbus.api.ApiClient;
 import com.appku.bookingbus.api.request.BookingRequest;
+import com.appku.bookingbus.api.request.PaymentRequest;
 import com.appku.bookingbus.api.response.BookingResponse;
+import com.appku.bookingbus.api.response.PaymentResponse;
+import com.appku.bookingbus.data.model.Booking;
 import com.appku.bookingbus.databinding.ActivityBookingBinding;
+import com.appku.bookingbus.ui.payment.PaymentWebViewActivity;
 import com.appku.bookingbus.utils.SessionManager;
 import com.google.android.material.chip.Chip;
 import com.google.gson.Gson;
@@ -184,26 +189,48 @@ public class BookingActivity extends AppCompatActivity {
             .enqueue(new Callback<BookingResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<BookingResponse> call, @NonNull Response<BookingResponse> response) {
-                    binding.progressBar.setVisibility(View.GONE);
-                    binding.btnBook.setEnabled(true);
-
-                    // log response
-                    Log.d("BookingActivity", "Response code: " + response.code());
-                    Log.d("BookingActivity", "Response body: " + response.body());
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        Toast.makeText(BookingActivity.this, "Booking created successfully", Toast.LENGTH_SHORT).show();
-                        // TODO: Handle payment URL/token from response
-                        finish();
-                    } else {
-                        String errorMessage = "Failed to create booking";
-                        if (response.body() != null) {
+                        // Ambil booking dari response
+                        BookingResponse.Data data = response.body().getData();
+                        Booking booking = (data != null) ? data.getBooking() : null;
+                        int bookingId = (booking != null) ? booking.getId() : -1;
+                        double amount = (booking != null) ? booking.getTotalAmount() : 0;
+
+                        if (bookingId > 0) {
+                            // Setelah booking sukses, buka detail booking
+                            Intent intent = new Intent(BookingActivity.this, BookingDetailActivity.class);
+                            intent.putExtra("booking_id", bookingId);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // Tambahkan log seluruh response JSON untuk debug
                             try {
-                                errorMessage = response.body().getMessage();
+                                String rawJson = response.errorBody() != null
+                                        ? response.errorBody().string()
+                                        : new Gson().toJson(response.body());
+                                Log.e("BookingActivity", "Booking ID not found. Raw response: " + rawJson);
+                                Toast.makeText(BookingActivity.this, "Booking gagal: Data booking tidak ditemukan. Silakan coba lagi atau hubungi admin.", Toast.LENGTH_LONG).show();
                             } catch (Exception e) {
-                                Log.e("BookingActivity", "Error parsing response: " + e.getMessage());
+                                Log.e("BookingActivity", "Error reading raw response", e);
                             }
+                            binding.progressBar.setVisibility(View.GONE);
+                            binding.btnBook.setEnabled(true);
                         }
-                        Toast.makeText(BookingActivity.this, "Failed to create booking", Toast.LENGTH_SHORT).show();
+                    } else {
+                        binding.progressBar.setVisibility(View.GONE);
+                        binding.btnBook.setEnabled(true);
+                        String errorBody = "";
+                        try {
+                            if (response.errorBody() != null) {
+                                errorBody = response.errorBody().string();
+                            } else if (response.body() != null) {
+                                errorBody = new Gson().toJson(response.body());
+                            }
+                        } catch (Exception e) {
+                            errorBody = "Error reading errorBody: " + e.getMessage();
+                        }
+                        Log.e("BookingActivity", "Booking failed: " + response.code() + " | " + errorBody);
+                        Toast.makeText(BookingActivity.this, "Booking failed", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -212,8 +239,7 @@ public class BookingActivity extends AppCompatActivity {
                     binding.progressBar.setVisibility(View.GONE);
                     binding.btnBook.setEnabled(true);
 
-                    // tambahkan log untuk debugging
-                    Log.e("BookingActivity", "Error: " + t.getMessage());
+                    Log.e("BookingActivity", "Booking error: ", t);
 
                     String errorMessage = "Network error";
                     if (t instanceof IOException) {
@@ -223,6 +249,49 @@ public class BookingActivity extends AppCompatActivity {
                     }
 
                     Toast.makeText(BookingActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
+
+    // Perbarui createPayment agar menerima semua field
+    private void createPayment(int bookingId, double amount, String paymentType, Map<String, Object> paymentDetails) {
+        PaymentRequest paymentRequest = new PaymentRequest(bookingId, amount, paymentType, paymentDetails);
+
+        String token = "Bearer " + sessionManager.getToken();
+
+        ApiClient.getInstance().getService().createPayment(token, paymentRequest)
+            .enqueue(new Callback<PaymentResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<PaymentResponse> call, @NonNull Response<PaymentResponse> response) {
+                    binding.progressBar.setVisibility(View.GONE);
+                    binding.btnBook.setEnabled(true);
+
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        // Buka WebView dengan URL pembayaran
+                        Intent intent = new Intent(BookingActivity.this, PaymentWebViewActivity.class);
+                        intent.putExtra("payment_url", response.body().getData().getPaymentUrl());
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        String errorBody = "";
+                        try {
+                            if (response.errorBody() != null) {
+                                errorBody = response.errorBody().string();
+                            }
+                        } catch (Exception e) {
+                            errorBody = "Error reading errorBody: " + e.getMessage();
+                        }
+                        Log.e("BookingActivity", "Payment failed: " + response.code() + " | " + errorBody);
+                        Toast.makeText(BookingActivity.this, "Payment initialization failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<PaymentResponse> call, @NonNull Throwable t) {
+                    binding.progressBar.setVisibility(View.GONE);
+                    binding.btnBook.setEnabled(true);
+                    Log.e("BookingActivity", "Payment error: ", t);
+                    Toast.makeText(BookingActivity.this, "Network error", Toast.LENGTH_SHORT).show();
                 }
             });
     }

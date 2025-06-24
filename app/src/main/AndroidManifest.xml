@@ -64,6 +64,10 @@
             android:name=".ui.booking.BookingDetailActivity"
             android:exported="false"
             android:theme="@style/Theme.BookingBus.NoActionBar" />
+        <activity
+            android:name=".ui.payment.PaymentWebViewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BookingBus.NoActionBar" />
     </application>
 
 </manifest>
