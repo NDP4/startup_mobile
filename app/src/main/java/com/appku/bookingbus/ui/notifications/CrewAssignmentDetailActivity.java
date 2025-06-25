@@ -35,9 +35,9 @@ public class CrewAssignmentDetailActivity extends AppCompatActivity {
         String json = getIntent().getStringExtra("assignment");
         CrewAssignment assignment = new Gson().fromJson(json, CrewAssignment.class);
 
-        ((TextView) findViewById(R.id.tvAssignmentId)).setText("ID: " + assignment.getId());
-        ((TextView) findViewById(R.id.tvStatus)).setText("Status: " + assignment.getStatus());
-        ((TextView) findViewById(R.id.tvNotes)).setText("Catatan: " + (assignment.getNotes() != null ? assignment.getNotes() : "-"));
+        ((TextView) findViewById(R.id.tvAssignmentId)).setText("" + assignment.getId());
+        ((TextView) findViewById(R.id.tvStatus)).setText("" + assignment.getStatus());
+        ((TextView) findViewById(R.id.tvNotes)).setText("" + (assignment.getNotes() != null ? assignment.getNotes() : "-"));
 
         // Crew Info
         TextView tvCrewName = findViewById(R.id.tvCrewName);
@@ -45,8 +45,8 @@ public class CrewAssignmentDetailActivity extends AppCompatActivity {
         ImageButton btnCopyPhone = findViewById(R.id.btnCopyPhone);
 
         if (assignment.getCrew() != null) {
-            tvCrewName.setText("Nama Crew: " + assignment.getCrew().getName());
-            tvCrewPhone.setText("No HP: " + assignment.getCrew().getPhone());
+            tvCrewName.setText("" + assignment.getCrew().getName());
+            tvCrewPhone.setText("" + assignment.getCrew().getPhone());
 
             btnCopyPhone.setOnClickListener(v -> {
                 String phone = assignment.getCrew().getPhone();
@@ -56,22 +56,26 @@ public class CrewAssignmentDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "Nomor telepon disalin ke clipboard", Toast.LENGTH_SHORT).show();
             });
         } else {
-            tvCrewName.setText("Nama Crew: -");
-            tvCrewPhone.setText("No HP: -");
+            tvCrewName.setText("");
+            tvCrewPhone.setText("");
             btnCopyPhone.setEnabled(false);
         }
 
         // Booking Info
         if (assignment.getBooking() != null) {
-            ((TextView) findViewById(R.id.tvBookingId)).setText("Booking ID: " + assignment.getBooking().getId());
-            ((TextView) findViewById(R.id.tvDestination)).setText("Tujuan: " + assignment.getBooking().getDestination());
-            ((TextView) findViewById(R.id.tvPickupLocation)).setText("Penjemputan: " + assignment.getBooking().getPickupLocation());
-            ((TextView) findViewById(R.id.tvBookingDate)).setText("Tanggal Sewa: " + formatDate(assignment.getBooking().getBookingDate()));
-            ((TextView) findViewById(R.id.tvReturnDate)).setText("Tanggal Kembali: " + formatDate(assignment.getBooking().getReturnDate()));
-            ((TextView) findViewById(R.id.tvTotalSeats)).setText("Jumlah Kursi: " + assignment.getBooking().getTotalSeats());
-            ((TextView) findViewById(R.id.tvSeatType)).setText("Jenis Kursi: " + assignment.getBooking().getSeatType());
-            ((TextView) findViewById(R.id.tvTotalAmount)).setText("Total: " + assignment.getBooking().getTotalAmount());
-            ((TextView) findViewById(R.id.tvSpecialRequests)).setText("Catatan: " + (assignment.getBooking().getSpecialRequests() != null ? assignment.getBooking().getSpecialRequests() : "-"));
+            ((TextView) findViewById(R.id.tvBookingId)).setText("" + assignment.getBooking().getId());
+            ((TextView) findViewById(R.id.tvDestination)).setText("" + assignment.getBooking().getDestination());
+            ((TextView) findViewById(R.id.tvPickupLocation)).setText("" + assignment.getBooking().getPickupLocation());
+            ((TextView) findViewById(R.id.tvBookingDate)).setText("" + formatDate(assignment.getBooking().getBookingDate()));
+            ((TextView) findViewById(R.id.tvReturnDate)).setText("" + formatDate(assignment.getBooking().getReturnDate()));
+            ((TextView) findViewById(R.id.tvTotalSeats)).setText("" + assignment.getBooking().getTotalSeats());
+            ((TextView) findViewById(R.id.tvSeatType)).setText("" + assignment.getBooking().getSeatType());
+            ((TextView) findViewById(R.id.tvTotalAmount)).setText(formatCurrency(assignment.getBooking().getTotalAmount()));
+            ((TextView) findViewById(R.id.tvSpecialRequests)).setText("" + (assignment.getBooking().getSpecialRequests() != null ? assignment.getBooking().getSpecialRequests() : "-"));
         }
+    }
+
+    private static String formatCurrency(double amount) {
+        return String.format(new Locale("id", "ID"), "Rp %,d", (long)amount);
     }
 }
